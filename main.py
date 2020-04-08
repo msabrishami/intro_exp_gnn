@@ -167,17 +167,16 @@ def train(dataset, task, writer):
     # model = GNNmsa(max(dataset.num_node_features, 1), 32, dataset.num_classes, task=task)
 
     # opt = optim.Adam(model.parameters(), lr=0.01)
-    opt = optim.SGD(model.parameters(), lr=0.1)
+    opt = optim.SGD(model.parameters(), lr=0.01)
     MILESTONE=[50, 100, 200, 400, 500]
     train_scheduler = optim.lr_scheduler.MultiStepLR(opt, milestones=MILESTONE, gamma=0.2)
 
     # train
-    for epoch in range(600):
+    for epoch in range(100):
         total_loss = 0
         total_count = 0
         total_correct = 0
         model.train()
-        print("loading batches")
         for batch in loader:
             opt.zero_grad()
             embedding, pred = model(batch)
@@ -216,12 +215,13 @@ def test(loader, model, is_validation=False):
             emb, pred = model(data)
             pred = pred.argmax(dim=1)
             label = data.y
-
-        if model.task == 'node':
-            mask = data.val_mask if is_validation else data.test_mask
-            # node classification: only evaluate on nodes in test set
-            pred = pred[mask]
-            label = data.y[mask]
+        
+        # Saeed issue with mask in karate dataset
+        #if model.task == 'node':
+        #     mask = data.val_mask if is_validation else data.test_mask
+        #     # node classification: only evaluate on nodes in test set
+        #     pred = pred[mask]
+        #     label = data.y[mask]
             
         correct += pred.eq(label).sum().item()
     
@@ -230,7 +230,8 @@ def test(loader, model, is_validation=False):
     else:
         total = 0
         for data in loader.dataset:
-            total += torch.sum(data.test_mask).item()
+            # total += torch.sum(data.test_mask).item()
+            total += len(data.y)
     return correct / total
 
 

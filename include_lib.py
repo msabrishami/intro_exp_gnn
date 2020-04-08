@@ -52,6 +52,10 @@ def set_dataset_masks(ds, train_ratio, test_ratio):
     # ds[0].train_mask = torch.tensor([False]*train_sz + [True]*test_sz + [False]*val_sz)
     # ds[0].val_mask = torch.tensor([False]*(train_sz + test_sz) + [True]*val_sz)
 
-ds = "Cora"
+#ds = "Cora"
+#writer = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+#dataset = Planetoid(root='/tmp/'+ds, name=ds)
+
 writer = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
-dataset = Planetoid(root='/tmp/'+ds, name=ds)
+dataset = KarateClub()
+
