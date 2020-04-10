@@ -21,6 +21,7 @@ from torch_geometric.datasets import CitationFull
 from torch_geometric.datasets import KarateClub
 from torch_geometric.datasets import Coauthor
 from torch_geometric.datasets import Amazon
+from torch_geometric.datasets import Reddit
 
 from torch_geometric.data import DataLoader
 import torch_geometric.transforms as T
@@ -198,7 +199,8 @@ if __name__ == "__main__":
         writer = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
         # dataset = SaeedClub()
         # dataset = Coauthor(root='/tmp/Coauthor', name="CS")
-        dataset = Amazon(root='/tmp/Amazon', name="Photo")
+        # dataset = Amazon(root='/tmp/Amazon', name="Photo")
+        dataset = Reddit(root="/tmp/Reddit")
         set_dataset_masks(dataset, 0.01, 0.2)
         pdb.set_trace()
         model = train(dataset, task, writer)
