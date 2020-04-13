@@ -29,7 +29,7 @@ import torch_geometric.transforms as T
 from tensorboardX import SummaryWriter
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
-from karate_saeed import SaeedClub
+from karate_mod import SaeedClub
 from models import Net, GNNStack
 
 
