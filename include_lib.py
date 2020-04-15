@@ -27,7 +27,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import pdb
 from itertools import repeat, product
-from karate_saeed import SaeedClub 
+from karate_mod import SaeedClub 
 
 def set_dataset_masks(ds, train_ratio, test_ratio):
     ''' the right way to do this is by tensors
@@ -84,17 +84,17 @@ print(type(ds2.data.num_nodes))
 
 
 
-ds1.data.train_mask = torch.tensor([True] * 34)
-ds3 = SaeedClub()
-
-print(type(ds1.data.train_mask))
-print(type(ds2.data.train_mask))
-
-loader1 = DataLoader(ds1, batch_size=4, shuffle=True)
-loader2 = DataLoader(ds2, batch_size=4, shuffle=True)
-loader3 = DataLoader(ds3, batch_size=4, shuffle=True)
-batch1 = next(iter(loader1))
-batch2 = next(iter(loader2))
+# ds1.data.train_mask = torch.tensor([True] * 34)
+# ds3 = SaeedClub()
+# 
+# print(type(ds1.data.train_mask))
+# print(type(ds2.data.train_mask))
+# 
+# loader1 = DataLoader(ds1, batch_size=4, shuffle=True)
+# loader2 = DataLoader(ds2, batch_size=4, shuffle=True)
+# loader3 = DataLoader(ds3, batch_size=4, shuffle=True)
+# batch1 = next(iter(loader1))
+# batch2 = next(iter(loader2))
 # print("========================")
 # ds = ds2
 # for key in ds.data.keys: 

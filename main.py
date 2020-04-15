@@ -49,7 +49,8 @@ def set_dataset_masks(ds, train_ratio, test_ratio):
         ds.data.valid_mask = torch.tensor([False] * sz)
         ds.data.valid_mask[int((train_ratio + test_ratio)*sz):] = True
         ds.slices["valid_mask"] = torch.tensor((0, sz))
-
+    ds.data.is_directed = "salam"
+    ds.slices["is_directed"] = 1
 
 def train(dataset, task, writer):
     if task == 'graph':
@@ -200,7 +201,10 @@ if __name__ == "__main__":
         # dataset = SaeedClub()
         # dataset = Coauthor(root='/tmp/Coauthor', name="CS")
         # dataset = Amazon(root='/tmp/Amazon', name="Photo")
-        dataset = Reddit(root="/tmp/Reddit")
+        # dataset = Reddit(root="/tmp/Reddit")
+        dataset = CitationFull("/tmp/CitationFull", name="cora")
+        dataset = Planetoid(root="/tmp/Cora", name="Cora")
+        pdb.set_trace()
         set_dataset_masks(dataset, 0.01, 0.2)
         pdb.set_trace()
         model = train(dataset, task, writer)
@@ -211,7 +215,7 @@ if __name__ == "__main__":
         # Planetoid: Cora, CiteSeer, PubMed
         ds = "Cora"
         writer = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
-        dataset = Planetoid(root='/tmp/'+ds, name=ds)
+
         # set_dataset_masks(dataset, 0.4, 0.2)
         model = train(dataset, task, writer)
         # writer = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
