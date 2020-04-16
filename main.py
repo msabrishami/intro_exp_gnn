@@ -137,8 +137,8 @@ def karate_train(dataset):
 
     test_loader = loader = DataLoader(dataset, batch_size=64, shuffle=True)
     model = Net(max(dataset.num_node_features, 1), 10)
-    opt = optim.Adam(model.parameters(), lr=0.01)
-    # opt = optim.SGD(model.parameters(), lr=0.1)
+    # opt = optim.Adam(model.parameters(), lr=0.01)
+    opt = optim.SGD(model.parameters(), lr=0.01)
     # MILESTONE=[50, 100, 200, 400, 500]
     # train_scheduler = optim.lr_scheduler.MultiStepLR(opt, milestones=MILESTONE, gamma=0.2)
     criterion = nn.MSELoss()
@@ -205,7 +205,7 @@ if __name__ == "__main__":
         # dataset = Reddit(root="/tmp/Reddit")
         # dataset = CitationFull("/tmp/CitationFull", name="cora")
         # dataset = Planetoid(root="/tmp/Cora", name="Cora")
-        dataset = AIFB_pyg()
+        dataset = AIFB_pyg(dataset_path="/home/msabrishami/.dgl/aifb/")
         # set_dataset_masks(dataset, 0.01, 0.2)
         model = train(dataset, task, writer)
         # karate_train(dataset)
