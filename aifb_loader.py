@@ -2,12 +2,53 @@
 import os
 import numpy as np
 import scipy.sparse as sp
-
+import pdb
 
 ''' More simple approach:
     import dgl.contrib.data.knowledge_graph as knwlgrh
     temp = knwlgrh.load_entity("aifb", 3, False)
 '''
+
+def _sp_row_vec_from_idx_list(idx_list, dim):
+    """Create sparse vector of dimensionality dim from a list of indices."""
+    shape = (1, dim)
+    data = np.ones(len(idx_list))
+    row_ind = np.zeros(len(idx_list))
+    col_ind = list(idx_list)
+    return sp.csr_matrix((data, (row_ind, col_ind)), shape=shape)
+
+
+def _get_neighbors(adj, nodes):
+    """Takes a set of nodes and a graph adjacency matrix and returns a set of neighbors."""
+    sp_nodes = _sp_row_vec_from_idx_list(list(nodes), adj.shape[1])
+    sp_neighbors = sp_nodes.dot(adj)
+    neighbors = set(sp.find(sp_neighbors)[1])  # convert to set of indices
+    return neighbors
+
+
+
+def _bfs_relational(adj, roots):
+    """
+    BFS for graphs with multiple edge types. Returns list of level sets.
+    Each entry in list corresponds to relation specified by adj_list.
+    """
+    visited = set()
+    current_lvl = set(roots)
+
+    next_lvl = set()
+
+    while current_lvl:
+
+        for v in current_lvl:
+            visited.add(v)
+
+        next_lvl = _get_neighbors(adj, current_lvl)
+        next_lvl -= visited  # set difference
+
+        yield next_lvl
+
+        current_lvl = set.union(next_lvl)
+
 
 
 def _load_sparse_csr(filename):
@@ -15,9 +56,71 @@ def _load_sparse_csr(filename):
     return sp.csr_matrix((loader['data'], loader['indices'], loader['indptr']),
             shape=loader['shape'], dtype=np.float32)
 
+
+class AIFB(object):
+    ''' based based on DGL library.
+    '''
+    
+    def __init__(self, dataset_name="aifb", dataset_path="/home/msabrishami/.dgl/aifb"):
+        self.name = dataset_name
+        self.path = dataset_path
+
+    def download_library():
+        print("Not implemented yet")
+        return True
+
+    def load_data(self):
+        ''' based on dgl/contrib/data/knowledge_graph._load_data
+        information about the files: (should be moved to download method)
+        there are 4 files:
+            
+        format: numpy.lib.npyio.NpzFile
+            description: NpzFile is used to load files in the NumPy .npz data archive format. 
+            It assumes that files in the archive have a .npy extension, other files are ignored.
+            NpzFile.files(): List of all files in the archive with a .npy extension.
+
+        - edges.npz ['edges', 'n', 'nrel']
+            edges: 3 dim, I don't know what is the 3rd dimension (90 unique values)
+
+        - labels.npz ['data', 'indices', 'indptr', 'shape']
+            data: ones(176)
+            indices: 176x[0,1,2,3]
+            indptr: 8286, with 177 unique values between 0-176
+
+
+        '''
+        graph_file = os.path.join(self.path, '{}_stripped.nt.gz'.format(self.name))
+        task_file = os.path.join(self.path, 'completeDataset.tsv')
+        train_file = os.path.join(self.path, 'trainingSet.tsv')
+        test_file = os.path.join(self.path, 'testSet.tsv')
+
+        # label_header = 'label_affiliation'
+        # nodes_header = 'person'
+
+        edge_file       = os.path.join(self.path, 'edges.npz')
+        labels_file     = os.path.join(self.path, 'labels.npz')
+        train_idx_file  = os.path.join(self.path, 'train_idx.npy')
+        test_idx_file   = os.path.join(self.path, 'test_idx.npy')
+        
+        all_edges = np.load(edge_file)
+        self.num_node = all_edges['n'].item()
+        self.edge_list = all_edges['edges']
+        self.num_rel = all_edges['nrel'].item()
+
+        self.labels = _load_sparse_csr(labels_file)
+        self.labeled_nodes_idx = list(self.labels.nonzero()[0])
+        
+        self.train_idx = np.load(train_idx_file)
+        self.test_idx = np.load(test_idx_file)
+
+        print('\t- Number of nodes: ', self.num_node)
+        print('\t- Number of edges: ', len(self.edge_list))
+        print('\t- Number of relations: ', self.num_rel)
+        print('\t- Number of classes: ', self.labels.shape[1])
+
+
 def _load_data(dataset_str='aifb', dataset_path=None):
     """
-
     :param dataset_str:
     :param rel_layers:
     :param limit: If > 0, will only load this many adj. matrices
@@ -26,9 +129,6 @@ def _load_data(dataset_str='aifb', dataset_path=None):
     :return:
     """
 
-    print("\t>> =======================================================================")
-    print("\t>> This is a stand alone function _load_data with no knowledge graph class")
-    print('\t>> Loading dataset', dataset_str, dataset_path)
     graph_file = os.path.join(dataset_path, '{}_stripped.nt.gz'.format(dataset_str))
     task_file = os.path.join(dataset_path, 'completeDataset.tsv')
     train_file = os.path.join(dataset_path, 'trainingSet.tsv')
@@ -192,7 +292,54 @@ def _load_data(dataset_str='aifb', dataset_path=None):
 
     for x in ["num_node", "edge_list", "num_rel", "labels", "labeled_nodes_idx", "train_idx", "test_idx"]:
         print("\t\t>> ", x)
-    return num_node, edge_list, num_rel, labels, labeled_nodes_idx, train_idx, test_idx
+
+    print("\t>> Preprocessing for BFS")
+    # TODO: fix these
+    bfs_level = 3
+    edges = edge_list 
+    num_nodes = num_node
+    relabel = False
+
+    if bfs_level > 0:
+        print("removing nodes that are more than {} hops away".format(bfs_level))
+        row, col, edge_type = edges.transpose()
+        A = sp.csr_matrix((np.ones(len(row)), (row, col)), shape=(num_nodes, num_nodes))
+        bfs_generator = _bfs_relational(A, labeled_nodes_idx)
+        lvls = list()
+        lvls.append(set(labeled_nodes_idx))
+        for _ in range(bfs_level):
+            lvls.append(next(bfs_generator))
+        to_delete = list(set(range(num_nodes)) - set.union(*lvls))
+        eid_to_delete = np.isin(row, to_delete) + np.isin(col, to_delete)
+        eid_to_keep = np.logical_not(eid_to_delete)
+        edge_src = row[eid_to_keep]
+        edge_dst = col[eid_to_keep]
+        edge_type = edge_type[eid_to_keep]
+
+        if relabel:
+            uniq_nodes, edges = np.unique((edge_src, edge_dst), return_inverse=True)
+            edge_src, edge_dst = np.reshape(edges, (2, -1))
+            node_map = np.zeros(num_nodes, dtype=int)
+            num_nodes = len(uniq_nodes)
+            node_map[uniq_nodes] = np.arange(num_nodes)
+            labels = labels[uniq_nodes]
+            train_idx = node_map[train_idx]
+            test_idx = node_map[test_idx]
+            print("{} nodes left".format(num_nodes))
+    else:
+        src, dst, edge_type = edges.transpose()
+
+        # normalize by dst degree
+        _, inverse_index, count = np.unique((edge_dst, edge_type), axis=1, return_inverse=True, return_counts=True)
+        degrees = count[inverse_index]
+        edge_norm = np.ones(len(edge_dst), dtype=np.float32) / degrees.astype(np.float32)
+
+        # convert to pytorch label format
+        num_classes = labels.shape[1]
+        labels = np.argmax(labels, axis=1)
+    
+    
+    return num_node, edges, num_rel, labels, labeled_nodes_idx, train_idx, test_idx
 
 
 if __name__ == "__main__":
@@ -200,6 +347,7 @@ if __name__ == "__main__":
     name = "aifb"
     dataset_path = "/home/msabrishami/.dgl/aifb"
     num_nodes, edges, num_rels, labels, labeled_nodes_idx, train_idx, test_idx = _load_data(name, dataset_path)
+
 '''
 graph_file = os.path.join(dataset_path, '{}_stripped.nt.gz'.format(dataset_str))
 task_file = os.path.join(dataset_path, 'completeDataset.tsv')
