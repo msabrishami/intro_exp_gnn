@@ -177,13 +177,12 @@ class AIFB_pyg(InMemoryDataset):
         data.num_nodes = ds.num_nodes   # need to be checked after preprocess
         # data.x = torch.eye(data.num_nodes, dtype=torch.float)
         data.x = torch.ones(data.num_nodes, 1)
-        data.y = torch.tensor(ds.labels)
+        data.y = torch.tensor(ds.labels).squeeze()
         data.train_mask = torch.tensor([False] * data.num_nodes)
         data.test_mask = torch.tensor([False] * data.num_nodes)
         data.train_mask[ds.train_idx] = True
         data.test_mask[ds.test_idx] = True
-        self.data = data
-        # self.data, self.slices = self.collate([data])
+        self.data, self.slices = self.collate([data])
 
     def _download(self):
         return
