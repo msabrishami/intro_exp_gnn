@@ -63,7 +63,7 @@ class AIFB(object):
     ''' based based on DGL library.
     '''
     
-    def __init__(self, dataset_name="aifb", dataset_path="/home/msabrishami/.dgl/aifb"):
+    def __init__(self, dataset_name="aifb", dataset_path=None):
         self.name = dataset_name
         self.path = dataset_path
 
@@ -164,9 +164,10 @@ class AIFB(object):
 
 class AIFB_pyg(InMemoryDataset):
 
-    def __init__(self, transform=None):
+    def __init__(self, dataset_path, transform=None):
         super(AIFB_pyg, self).__init__(".", transform, None, None)
-        ds = AIFB()
+        self.dataset_path = dataset_path
+        ds = AIFB(dataset_path=dataset_path)
         ds.load_data()
         ds.preprocess()
         src_tensor = torch.from_numpy(ds.edge_src.astype(np.int64)).to(torch.long)
