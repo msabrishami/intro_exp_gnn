@@ -34,7 +34,6 @@ from karate_mod import SaeedClub
 from models import Net, GNNStack
 
 
-
 def set_dataset_masks(ds, train_ratio, test_ratio):
     ''' the right way to do this is by tensors
     and not using for loop, needs to be fixed ''' 
@@ -77,6 +76,7 @@ def train(dataset, task, writer):
         total_correct = 0
         model.train()
         for batch in loader:
+            pdb.set_trace()
             opt.zero_grad()
             embedding, pred = model(batch)
             label = batch.y
