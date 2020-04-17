@@ -28,14 +28,14 @@ class GNNmsa(nn.Module):
         super(GNNmsa, self).__init__()
         self.task = task
         # self.convs = nn.ModuleList()
-        h1s = 32 
+        h1s = 16 
         self.conv1 = self.build_conv_model(input_dim, h1s)
         self.ln1 = nn.LayerNorm(h1s)
 
         self.conv2 = self.build_conv_model(h1s, hidden_dim)
         self.ln2 = nn.LayerNorm(hidden_dim)
 
-        self.conv3 = self.build_conv_model(hidden_dim, 32)
+        self.conv3 = self.build_conv_model(hidden_dim, 16)
         self.ln3 = nn.LayerNorm(hidden_dim)
 
         # post-message-passing

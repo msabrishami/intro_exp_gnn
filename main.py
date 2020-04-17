@@ -31,7 +31,7 @@ from tensorboardX import SummaryWriter
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 from karate_mod import SaeedClub
-from models import Net, GNNStack
+from models import Net, GNNStack, GNNmsa
 
 
 def set_dataset_masks(ds, train_ratio, test_ratio):
@@ -61,8 +61,8 @@ def train(dataset, task, writer):
         print("loading dataloader")
         test_loader = loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
-    model = GNNStack(max(dataset.num_node_features, 1), 16, dataset.num_classes, task=task)
-    # model = GNNmsa(max(dataset.num_node_features, 1), 32, dataset.num_classes, task=task)
+    # model = GNNStack(max(dataset.num_node_features, 1), 16, dataset.num_classes, task=task)
+    model = GNNmsa(max(dataset.num_node_features, 1), 16, dataset.num_classes, task=task)
 
     opt = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0005)
     # opt = optim.SGD(model.parameters(), lr=0.01)
@@ -76,7 +76,6 @@ def train(dataset, task, writer):
         total_correct = 0
         model.train()
         for batch in loader:
-            pdb.set_trace()
             opt.zero_grad()
             embedding, pred = model(batch)
             label = batch.y
@@ -97,7 +96,7 @@ def train(dataset, task, writer):
         writer.add_scalar("loss", total_loss, epoch)
 
         if epoch % 2 == 0:
-            test_acc = test(test_loader, model)
+            test_acc = test(test_loader, model, perClass=4)
             print("Epoch {}. \tLoss: {:.4f} \tTrain acc: {:.4f} \tTest acc: {:.4f}".format(
                 epoch, total_loss, train_acc, test_acc))
             writer.add_scalar("test accuracy", test_acc, epoch)
@@ -106,10 +105,13 @@ def train(dataset, task, writer):
 
 
 
-def test(loader, model, is_validation=False):
+def test(loader, model, is_validation=False, perClass=None):
     model.eval()
 
     correct = 0
+    if perClass is not None:
+        correct_class = [0] * perClass
+        total_class = [0] * perClass
     for data in loader:
         with torch.no_grad():
             emb, pred = model(data)
@@ -121,6 +123,13 @@ def test(loader, model, is_validation=False):
             # node classification: only evaluate on nodes in test set
             pred = pred[mask]
             label = data.y[mask]
+
+        if perClass is not None:
+            # code is not efficient for now
+            pred_correct  = pred == label
+            for c in range(perClass):
+                correct_class[c] += sum(pred_correct[label == c]).item()
+                total_class[c] += sum(label == c).item()
             
         correct += pred.eq(label).sum().item()
     
@@ -130,6 +139,9 @@ def test(loader, model, is_validation=False):
         total = 0
         for data in loader.dataset:
             total += torch.sum(data.test_mask).item()
+    if perClass is not None:
+        print(total_class)
+        print(correct_class)
     return correct / total
 
 

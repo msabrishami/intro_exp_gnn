@@ -163,6 +163,8 @@ class AIFB(object):
 
 
 class AIFB_pyg(InMemoryDataset):
+    ''' is_directed method is not working
+    '''
 
     def __init__(self, dataset_path, transform=None):
         super(AIFB_pyg, self).__init__(".", transform, None, None)
@@ -193,6 +195,16 @@ class AIFB_pyg(InMemoryDataset):
 
     def __repr__(self):
         return '{}()'.format(self.__class__.__name__)
-
+   
+    def info(self):
+       print("Num. of nodes: {}".format(self.data.num_nodes[0]))
+       print("Num. of edges: {}".format(self.data.num_edges))
+       print("Num. of train samples: {}".format(sum(self.data.train_mask).item()))
+       print("Num. of test samples: {}".format(sum(self.data.test_mask).item()))
+       print("Num. of samples per class in training dataset:", end=" ")
+       for i in range(4): print(sum(self.data.y[self.data.train_mask] == i).item(), end=" ")
+       print()
+       print("Num. of samples per class in test dataset:", end=" ")
+       for i in range(4): print(sum(self.data.y[self.data.test_mask] == i).item(), end=" ")
 
 
