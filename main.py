@@ -62,7 +62,7 @@ def train(dataset, task, writer):
         test_loader = loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     # model = GNNStack(max(dataset.num_node_features, 1), 16, dataset.num_classes, task=task)
-    model = GNNmsa(max(dataset.num_node_features, 1), 16, dataset.num_classes, task=task)
+    model = GNNmsa(max(dataset.num_node_features, 1), 32, dataset.num_classes, task=task)
 
     opt = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0005)
     # opt = optim.SGD(model.parameters(), lr=0.01)

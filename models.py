@@ -28,15 +28,14 @@ class GNNmsa(nn.Module):
         super(GNNmsa, self).__init__()
         self.task = task
         # self.convs = nn.ModuleList()
-        h1s = 16 
-        self.conv1 = self.build_conv_model(input_dim, h1s)
-        self.ln1 = nn.LayerNorm(h1s)
+        self.conv1 = self.build_conv_model(input_dim, hidden_dim)
+        self.ln1 = nn.LayerNorm(hidden_dim)
 
-        self.conv2 = self.build_conv_model(h1s, hidden_dim)
-        self.ln2 = nn.LayerNorm(hidden_dim)
+        # self.conv2 = self.build_conv_model(hidden_dim, hidden_dim)
+        # self.ln2 = nn.LayerNorm(hidden_dim)
 
-        self.conv3 = self.build_conv_model(hidden_dim, 16)
-        self.ln3 = nn.LayerNorm(hidden_dim)
+        # self.conv3 = self.build_conv_model(hidden_dim, 16)
+        # self.ln3 = nn.LayerNorm(hidden_dim)
 
         # post-message-passing
         self.post_mp = nn.Sequential(
@@ -47,7 +46,7 @@ class GNNmsa(nn.Module):
             raise RuntimeError('Unknown task.')
 
         self.dropout = 0.25
-        self.num_layers = 3
+        self.num_layers = 2
 
     def build_conv_model(self, input_dim, hidden_dim):
         # refer to pytorch geometric nn module for different implementation of GNNs.
@@ -67,15 +66,16 @@ class GNNmsa(nn.Module):
         x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.ln1(x)
 
-        x = self.conv2(x, edge_index)
-        x = F.relu(x)
-        x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.ln2(x)
-
-        x = self.conv3(x, edge_index)
+        # x = self.conv2(x, edge_index)
         emb = x
-        x = F.relu(x)
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        # x = F.relu(x)
+        # x = F.dropout(x, p=self.dropout, training=self.training)
+        # x = self.ln2(x)
+
+        # x = self.conv3(x, edge_index)
+        # emb = x
+        # x = F.relu(x)
+        # x = F.dropout(x, p=self.dropout, training=self.training)
 
         if self.task == 'graph':
             x = pyg_nn.global_mean_pool(x, batch)
