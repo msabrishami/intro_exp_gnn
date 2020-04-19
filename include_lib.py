@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 import pdb
 from itertools import repeat, product
 from karate_mod import SaeedClub 
+from aifb import AIFB_pyg
 
 def set_dataset_masks(ds, train_ratio, test_ratio):
     ''' the right way to do this is by tensors
@@ -54,34 +55,28 @@ def set_dataset_masks(ds, train_ratio, test_ratio):
     # ds[0].train_mask = torch.tensor([False]*train_sz + [True]*test_sz + [False]*val_sz)
     # ds[0].val_mask = torch.tensor([False]*(train_sz + test_sz) + [True]*val_sz)
 
-writer2 = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
-ds2 = Planetoid(root='/tmp/Cora', name="Cora")
-
-writer1 = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
-ds1 = KarateClub()
-
-print(type(ds1))
-print(type(ds2))
-
-print(type(ds1.data))
-print(type(ds2.data))
-
-print(ds1.num_features)
-print(ds2.num_features)
-
-print(ds1.num_node_features)
-print(ds2.num_node_features)
-
-
-print(ds1.data)
-print(ds2.data)
-
-print(ds1.data.num_nodes)
-print(ds2.data.num_nodes)
-print(type(ds1.data.num_nodes))
-print(type(ds2.data.num_nodes))
+# writer2 = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+# ds2 = Planetoid(root='/tmp/Cora', name="Cora")
+# writer1 = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+# ds1 = KarateClub()
+# 
+# print(type(ds1))
+# print(type(ds2))
+# print(type(ds1.data))
+# print(type(ds2.data))
+# print(ds1.num_features)
+# print(ds2.num_features)
+# print(ds1.num_node_features)
+# print(ds2.num_node_features)
+# print(ds1.data)
+# print(ds2.data)
+# print(ds1.data.num_nodes)
+# print(ds2.data.num_nodes)
+# print(type(ds1.data.num_nodes))
+# print(type(ds2.data.num_nodes))
 
 
+ds = AIFB_pyg("/home/msabrishami/.dgl/aifb")
 
 
 # ds1.data.train_mask = torch.tensor([True] * 34)

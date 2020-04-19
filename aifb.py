@@ -116,10 +116,13 @@ class AIFB(object):
         self.train_idx = np.load(train_idx_file)
         self.test_idx = np.load(test_idx_file)
 
-        print('\t- Number of nodes: ', self.num_nodes)
-        print('\t- Number of edges: ', len(self.edge_list))
-        print('\t- Number of relations: ', self.num_rel)
-        print('\t- Number of classes: ', self.labels.shape[1])
+        print('\t- Raw data loaded from ' + self.path)
+        print('\t- Num. of nodes: ', self.num_nodes)
+        print('\t- Num. of edges: ', len(self.edge_list))
+        print('\t- Num. of relations: ', self.num_rel)
+        print('\t- Num. of classes: ', self.labels.shape[1])
+        print('\t- Num. of train: ', len(self.train_idx))
+        print('\t- Num. of test: ', len(self.test_idx))
     
     def preprocess(self, bfs_level=3, relabel=False):
         
@@ -171,6 +174,7 @@ class AIFB_pyg(InMemoryDataset):
         self.dataset_path = dataset_path
         ds = AIFB(dataset_path=dataset_path)
         ds.load_data()
+        pdb.set_trace()
         ds.preprocess()
         src_tensor = torch.from_numpy(ds.edge_src.astype(np.int64)).to(torch.long)
         dst_tensor = torch.from_numpy(ds.edge_dst.astype(np.int64)).to(torch.long)
