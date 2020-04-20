@@ -16,10 +16,31 @@ The **November 2006 version of the AIFB metadata** comprises an additional set o
 - *146* instances instantiate the Project class. 
 - The instances are connected by a total of 15883 object property axioms and participate in a total of 8705 datatype properties.
 
-[1]: https://madoc.bib.uni-mannheim.de/41308/1/Ristoski_Datasets.pdf
-[2]: http://iswc2007.semanticweb.org/papers/057.pdf
-[3]: https://link.springer.com/chapter/10.1007/11595014_22
+In [2]  using SWRC ontology: we have designed **two classification problems** that we have experimentally evaluated, namely the **assignment of instances of the Person and Paper classes to one of the four research groups they are affiliated
+with** (or, in the case of papers, where one of the authors is affiliated with).
+
+This original dataset **in n3 format** (upload date is 2013) can be found in 
+https://figshare.com/articles/AIFB_DataSet/745364
+and can be processed with code in  
+https://en.wikiversity.org/wiki/AIFB_DataSet. The *Resource Description Framework* (**RDF**) format of the data can be found in 
+https://www.myexperiment.org/files/912.html
+and can be process using *rdflib* package in python. In both of these dataset formats there are **178 Person nodes**. 
+
+But the main problem is that the dgl dataset extracted from  R-GCN paper has only **176 Person nodes**. 
+
+
+<cite>[\[1\] A Collection of Benchmark Datasets for Systematic Evaluations of Machine Learning on the Semantic Web][1]</cite>
+
+<cite>[\[2\] Kernel Methods for Mining Instance Data in Ontologies][2]</cite>
+
 <cite>[\[3\] The SWRC Ontology – Semantic Web for Research Communities][3]</cite>
+
+[1]: https://madoc.bib.uni-mannheim.de/41308/1/Ristoski_Datasets.pdf
+
+[2]: http://iswc2007.semanticweb.org/papers/057.pdf
+
+[3]: https://link.springer.com/chapter/10.1007/11595014_22
+
 
 ## How to use torch_geometric datasets:
 
