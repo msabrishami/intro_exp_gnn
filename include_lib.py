@@ -92,9 +92,4 @@ ds = AIFB_pyg("/home/msabrishami/.dgl/aifb")
 # batch2 = next(iter(loader2))
 # print("========================")
 # ds = ds2
-# for key in ds.data.keys: 
-#     print(key)
-#     item, slices = ds.data[key], ds.slices[key]
-#     if torch.is_tensor(item): 
-#         s = list(repeat(slice(None), item.dim()))
-# 
+ 
