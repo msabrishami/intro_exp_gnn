@@ -112,6 +112,7 @@ class AIFB(object):
 
         self.labels = _load_sparse_csr(labels_file)
         self.labeled_nodes_idx = list(self.labels.nonzero()[0])
+        pdb.set_trace()
         
         self.train_idx = np.load(train_idx_file)
         self.test_idx = np.load(test_idx_file)
