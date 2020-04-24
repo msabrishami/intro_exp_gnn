@@ -90,6 +90,3 @@ ds = AIFB_pyg("/home/msabrishami/.dgl/aifb")
 # loader3 = DataLoader(ds3, batch_size=4, shuffle=True)
 # batch1 = next(iter(loader1))
 # batch2 = next(iter(loader2))
-# print("========================")
-# ds = ds2
- 
